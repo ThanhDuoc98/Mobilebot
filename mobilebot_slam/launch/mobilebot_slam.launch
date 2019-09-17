@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <!-- Arguments -->
+  <arg name="slam_methods" default="karto" doc="slam type [gmapping, cartographer, hector, karto, frontier_exploration]"/>
+  <arg name="configuration_basename" default="mobilebot_lds_2d.lua"/>
+  <arg name="open_rviz" default="true"/>
+
+  <!-- MobileBot -->
+  <include file="$(find mobilebot_bringup)/launch/mobilebot_remote.launch">
+  </include>
+
+  <!-- SLAM: Gmapping, Cartographer, Hector, Karto, Frontier_exploration, RTAB-Map -->
+  <include file="$(find mobilebot_slam)/launch/mobilebot_$(arg slam_methods).launch">
+    <arg name="configuration_basename" value="$(arg configuration_basename)"/>
+  </include>
+
+  <!-- rviz -->
+  <group if="$(arg open_rviz)"> 
+    <node pkg="rviz" type="rviz" name="rviz" required="true"
+          args="-d $(find mobilebot_slam)/rviz/mobilebot_$(arg slam_methods).rviz"/>
+  </group>
+</launch>

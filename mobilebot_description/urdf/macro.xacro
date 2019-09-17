@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="https://www.ros.org/wiki/xacro">
+
+<!-- axel -->
+    <!-- link axel -->
+    <xacro:macro name="link_axel" params="direction side">
+        <link name="p3at_${direction}_${side}_axle">
+            <inertial>
+                <mass value="0.1"/>	
+                <origin xyz="0 0 0"/>
+                <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                    iyy="1.0" iyz="0.0" izz="1.0"/>
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry name="pioneer_geom">
+                    <mesh filename="package://mobilebot_description/meshes/p3at_meshes/axle.stl"/>
+                </geometry>
+                <material name="AxleGrey" />
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://mobilebot_description/meshes/p3at_meshes/axle.stl"/>
+                </geometry>
+            </collision>
+        </link>
+    </xacro:macro>
+    <!-- joint axel -->
+    <xacro:macro name="joint_axel" params="direction side reflect position">
+        <joint name="p3at_${direction}_${side}_axle_joint" type="fixed">
+            <origin xyz="${position} ${reflect*0.156} 0.111" rpy="0 0 0"/>
+            <parent link="base_link"/>
+            <child link="p3at_${direction}_${side}_axle"/>
+        </joint>
+    </xacro:macro>
+
+<!-- hub -->
+    <!-- link hub -->
+    <xacro:macro name="link_hub" params="direction side">
+        <link name="p3at_${direction}_${side}_hub">
+            <inertial>
+                <mass value="0.1"/>	
+                <origin xyz="0 0 0"/>
+                <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                    iyy="1.0" iyz="0.0" izz="1.0"/>
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry name="pioneer_geom">
+                    <mesh filename="package://mobilebot_description/meshes/p3at_meshes/${side}_hubcap.stl"/>
+                </geometry>
+                <material name="HubcapYellow"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://mobilebot_description/meshes/p3at_meshes/${side}_hubcap.stl"/>
+                </geometry>
+            </collision>
+        </link>
+    </xacro:macro>
+    <!-- joint hub -->
+    <xacro:macro name="joint_hub" params="direction side reflect position">
+        <joint name="p3at_${direction}_${side}_hub_joint" type="fixed">
+            <origin xyz="${position} ${reflect*0.041} 0" rpy="0 0 0"/>
+            <parent link="p3at_${direction}_${side}_axle"/>
+            <child link="p3at_${direction}_${side}_hub"/>
+        </joint>
+    </xacro:macro>
+
+<!-- wheel -->
+    <!-- wheel link -->
+    <xacro:macro name="link_wheel" params="direction side">
+        <link name="p3at_${direction}_${side}_wheel">
+            <inertial>
+                <mass value="0.5"/>	
+                <origin xyz="0 0 0"/>
+                <inertia ixx="0.012411765597" ixy="0" ixz="0"
+                    iyy="0.015218160428" iyz="0" izz="0.011763977943"/>
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry name="pioneer_geom">
+                    <mesh filename="package://mobilebot_description/meshes/p3at_meshes/wheel.stl"/>
+                </geometry>
+                <material name="WheelBlack"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="${-3.1415927/2} 0 0"/>
+                <geometry>
+                    <!--mesh filename="package://mobilebot_description/meshes/p3at_meshes/wheel.stl"/-->
+                    <cylinder radius="0.111" length="0.075"/>
+                </geometry>
+            </collision>
+	    </link>
+    </xacro:macro>
+    <!-- joint wheel -->
+    <xacro:macro name="joint_wheel" params="direction side">
+        <joint name="p3at_${direction}_${side}_wheel_joint" type="continuous">
+            <axis xyz="0 1 0"/>
+                <anchor xyz="0 0 0"/>
+                <limit effort="100" velocity="100" />
+                <joint_properties damping="0.7"/>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <parent link="p3at_${direction}_${side}_hub"/>
+            <child link="p3at_${direction}_${side}_wheel"/>
+        </joint>
+    </xacro:macro>
+    
+</robot>

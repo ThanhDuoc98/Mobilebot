@@ -1,0 +1,399 @@
+<?xml version="1.0" ?>
+
+<robot name="mobilebot" xmlns:xacro="https://www.ros.org/wiki/xacro"
+	xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+>
+
+<!-- include xacro -->
+  <!-- include materials-->
+  <xacro:include filename="$(find mobilebot_description)/urdf/materials.xacro" />
+  <!-- include macro -->
+  <xacro:include filename="$(find mobilebot_description)/urdf/macro.xacro" />
+  <!-- include kinect -->
+  <xacro:include filename="$(find mobilebot_description)/urdf/kinect.xacro" />
+
+<!--   differential drive plugin  -->
+	<gazebo>
+		<plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
+			<alwaysOn>true</alwaysOn>
+			<updateRate>50000.0</updateRate>
+			<!-- <robotNamespace>/</robotNamespace> -->
+			<leftFrontJoint>p3at_front_left_wheel_joint</leftFrontJoint>
+			<rightFrontJoint>p3at_front_right_wheel_joint</rightFrontJoint>
+			<leftRearJoint>p3at_back_left_wheel_joint</leftRearJoint>
+			<rightRearJoint>p3at_back_right_wheel_joint</rightRearJoint>
+			<wheelSeparation>0.4</wheelSeparation>
+			<wheelDiameter>0.215</wheelDiameter>
+			<robotBaseFrame>base_link</robotBaseFrame>
+			<torque>200</torque>
+			<commandTopic>cmd_vel</commandTopic>
+			<odometryTopic>odom</odometryTopic>
+			<odometryFrame>odom</odometryFrame>
+			<broadcastTF>1</broadcastTF>
+		</plugin>
+	</gazebo>
+
+	<!-- <link name="base_footprint"/>
+
+	<joint name="base_joint" type="fixed">
+		<parent link="base_footprint"/>
+		<child link="base_link" />
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+	</joint> -->
+
+<!-- Chassis -->
+	<link name="base_link">
+		<!-- pose and inertial -->
+    	<!-- <pose>0 0 0.1 0 0 0</pose> -->
+		
+		<inertial>
+			<mass value="10.0"/>
+			<origin xyz="0 0 0.177"/>
+			<inertia ixx="0.3338" ixy="0.0" ixz="0.0"
+				 iyy="0.4783" iyz="0.0"
+				 izz="0.3338"/>
+		</inertial>
+		<visual>
+			<origin xyz="0 0 0.177" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/chassis.stl"/>
+			</geometry>
+			<material name="ChassisRed"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0.177" rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://mobilebot_description/meshes/p3at_meshes/chassis.stl"/>
+				</geometry>
+		</collision>
+	</link>
+	<gazebo reference="base_link">
+		<material>Gazebo/Red</material>
+	</gazebo>
+
+<!-- imu -->
+	<joint name="imu_joint" type="fixed">
+		<parent link="base_link"/>
+		<child link="imu_link"/>
+		<origin xyz="0.0 0 0.068" rpy="0 0 0"/>
+	</joint>
+
+	<link name="imu_link"/>
+
+	<gazebo reference="imu_link">
+		<sensor type="imu" name="imu">
+		<always_on>true</always_on>
+		<visualize>false</visualize>
+		</sensor>
+		<material>Gazebo/Grey</material>
+	</gazebo>
+
+<!-- Top -->
+	<link name="top_plate">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="-0.025 0 -0.223"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0"
+ 				izz="1.0"/>
+		</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/top.stl"/>
+			</geometry>
+			<material name="TopBlack"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0 0 0"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="top_plate">
+		<material>Gazebo/Black</material>
+	</gazebo>
+	<joint name="base_top_joint" type="fixed">
+		<origin xyz="0.003 0 0.274" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="top_plate"/>
+	</joint>
+
+<!-- Front + Back Sonar -->
+	<link name="front_sonar">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+		</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/front_sonar.stl"/>
+			</geometry>
+			<material name="SonarYellow"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0 0 0"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="front_sonar">
+		<material>Gazebo/Yellow</material>
+	</gazebo>
+	<joint name="base_front_joint" type="fixed">
+		<origin xyz="0.193 0 0.25" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="front_sonar"/>
+	</joint>
+
+	<link name="back_sonar">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+		</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/back_sonar.stl"/>
+			</geometry>
+			<material name="SonarYellow"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0 0 0"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="back_sonar">
+		<material>Gazebo/Yellow</material>
+	</gazebo>
+	<joint name="base_back_joint" type="fixed">
+		<origin xyz="-0.187 0 0.247" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="back_sonar"/>
+	</joint>
+
+<!-- Front Axles + Wheels + Hubcaps -->
+
+	<!-- left -->
+
+	<!-- front left link axel -->
+	<xacro:link_axel direction="front" side="left" />
+	<!-- front left joint axel -->
+	<xacro:joint_axel direction="front" side="left" reflect="1" position="0.135" />
+	<gazebo reference="p3at_front_left_axle">
+		<material>Gazebo/Grey</material>
+	</gazebo>
+
+	<!-- front left link hub -->
+	<xacro:link_hub direction="front" side="left" />
+	<!-- front left joint hub -->
+	<xacro:joint_hub direction="front" side="left" reflect="1" position="0" />
+	<gazebo reference="p3at_front_left_hub">
+		<material>Gazebo/Yellow</material>
+	</gazebo>
+
+	<!-- front left link wheel -->
+	<xacro:link_wheel direction="front" side="left" />
+	<!-- front left joint wheel -->
+	<xacro:joint_wheel direction="front" side="left" />
+	<gazebo reference="p3at_front_left_wheel">
+		<material>Gazebo/Black</material>
+	</gazebo>
+
+	<!-- right -->
+
+	<!-- front right link axel -->
+	<xacro:link_axel direction="front" side="right" />
+	<!-- front right joint axel -->
+	<xacro:joint_axel direction="front" side="right" reflect="-1" position="0.135" />
+	<gazebo reference="p3at_front_right_axle">
+		<material>Gazebo/Grey</material>
+	</gazebo>
+
+	<!-- front right link hub -->
+	<xacro:link_hub direction="front" side="right" />
+	<!-- front right joint hub -->
+	<xacro:joint_hub direction="front" side="right" reflect="-1" position="0" />
+	<gazebo reference="p3at_front_right_hub">
+		<material>Gazebo/Yellow</material>
+	</gazebo>
+
+	<!-- front right link wheel -->
+	<xacro:link_wheel direction="front" side="right" />
+	<!-- front right joint wheel -->
+	<xacro:joint_wheel direction="front" side="right" />
+	<gazebo reference="p3at_front_right_wheel">
+		<material>Gazebo/Black</material>
+	</gazebo>
+
+<!-- Back Axles + Wheels + Hubcaps -->
+
+	<!-- left -->
+
+	<!-- back left link axel -->
+	<xacro:link_axel direction="back" side="left" />
+	<!-- back left joint axel -->
+	<xacro:joint_axel direction="back" side="left" reflect="1" position="-0.134" />
+	<gazebo reference="p3at_back_left_axle">
+		<material>Gazebo/Grey</material>
+	</gazebo>
+
+	<!-- back left link hub -->
+	<xacro:link_hub direction="back" side="left" />
+	<!-- back left joint hub -->
+	<xacro:joint_hub direction="back" side="left" reflect="1" position="-0" />
+	<gazebo reference="p3at_back_left_hub">
+		<material>Gazebo/Yellow</material>
+	</gazebo>
+
+	<!-- back left link wheel -->
+	<xacro:link_wheel direction="back" side="left" />
+	<!-- back left joint wheel -->
+	<xacro:joint_wheel direction="back" side="left" />
+	<gazebo reference="p3at_back_left_wheel">
+		<material>Gazebo/Black</material>
+	</gazebo>
+
+	<!-- right -->
+
+	<!-- back right link axel -->
+	<xacro:link_axel direction="back" side="right" />
+	<!-- back right joint axel -->
+	<xacro:joint_axel direction="back" side="right" reflect="-1" position="-0.134" />
+	<gazebo reference="p3at_back_right_axle">
+		<material>Gazebo/Grey</material>
+	</gazebo>
+
+	<!-- back right link hub -->
+	<xacro:link_hub direction="back" side="right" />
+	<!-- back right joint hub -->
+	<xacro:joint_hub direction="back" side="right" reflect="-1" position="-0" />
+	<gazebo reference="p3at_back_right_hub">
+		<material>Gazebo/Yellow</material>
+	</gazebo>
+
+	<!-- back right link wheel -->
+	<xacro:link_wheel direction="back" side="right" />
+	<!-- back right joint wheel -->
+	<xacro:joint_wheel direction="back" side="right" />
+	<gazebo reference="p3at_back_right_wheel">
+		<material>Gazebo/Black</material>
+	</gazebo>
+
+
+<!-- kinect camera -->
+	<!-- <xacro:kinect xyz="0.150 0 0.037" parent_frame="top_plate" /> -->
+	<link name="camera_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 1.570796"/>
+			<geometry>
+				<mesh filename="package://mobilebot_description/meshes/kinect.dae"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.07271 0.27794 0.073"/>
+			</geometry>
+		</collision>
+		<inertial>
+			<mass value="0.564" />
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<inertia ixx="0.003881243" ixy="0.0" ixz="0.0"
+								iyy="0.000498940" iyz="0.0"
+								izz="0.003879257" />
+		</inertial>
+  	</link>
+	<joint name="camera_joint" type="fixed">
+		<axis xyz="0 1 0" />
+		<origin xyz="0.150 0 0.037" rpy="0 0 0"/>
+		<parent link="top_plate"/>
+		<child link="camera_link"/>
+	</joint>
+
+	<joint name="camera_rgb_joint" type="fixed">
+		<!-- <origin xyz="-0.087 -0.0125 0.2870" rpy="0 0 0"/> -->
+		<origin xyz="-0.087 -0.0125 0.2870" rpy="0 0 0"/>
+		<parent link="camera_link"/>
+		<child link="camera_rgb_frame"/>
+	</joint>
+	<link name="camera_rgb_frame"/>
+
+	<joint name="camera_rgb_optical_joint" type="fixed">
+		<!-- <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" /> -->
+		<origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
+		<parent link="camera_rgb_frame" />
+		<child link="camera_rgb_optical_frame" />
+	</joint>
+	<link name="camera_rgb_optical_frame"/>
+
+	<joint name="camera_depth_joint" type="fixed">
+		<origin xyz="0 -0.0250 0" rpy="0 0 0" />
+		<parent link="camera_rgb_frame" />
+		<child link="camera_depth_frame" />
+	</joint>
+	<link name="camera_depth_frame"/>
+
+	<joint name="camera_depth_optical_joint" type="fixed">
+		<!-- <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" /> -->
+		<origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
+		<parent link="camera_depth_frame" />
+		<child link="camera_depth_optical_frame" />
+	</joint>
+	<link name="camera_depth_optical_frame" />
+
+	<gazebo reference="camera_link">
+		<sensor type="depth" name="openni_camera">
+			<pose>0 0 0 0 0 0</pose>
+			<always_on>true</always_on>
+			<visualize>true</visualize>
+			<camera>
+				<horizontal_fov>1.047197551</horizontal_fov>  
+				<image>
+					<width>640</width>
+					<height>480</height>
+					<format>R8G8B8</format>
+				</image>
+				<clip>
+					<near>0.05</near>
+					<far>8.0</far>
+				</clip>
+			</camera>
+			<plugin name="camera_controller" filename="libgazebo_ros_openni_kinect.so">
+				<alwaysOn>true</alwaysOn>
+				<updateRate>0</updateRate>
+				<cameraName>camera</cameraName>
+				<frameName>camera_link</frameName>               
+				<imageTopicName>rgb/image_raw</imageTopicName>
+				<depthImageTopicName>depth/image_raw</depthImageTopicName>
+				<pointCloudTopicName>depth/points</pointCloudTopicName>
+				<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>              
+				<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>            
+				<pointCloudCutoff>0.4</pointCloudCutoff>
+				<baseline>0.1</baseline>                
+				<hackBaseline>0.0</hackBaseline>
+				<distortionK1>0.0</distortionK1>
+				<distortionK2>0.0</distortionK2>
+				<distortionK3>0.0</distortionK3>
+				<distortionT1>0.0</distortionT1>
+				<distortionT2>0.0</distortionT2>
+				<CxPrime>0.0</CxPrime>
+				<Cx>0.0</Cx>
+				<Cy>0.0</Cy>
+				<focalLength>0.0</focalLength>
+			</plugin>
+		</sensor>
+	</gazebo>
+
+</robot>

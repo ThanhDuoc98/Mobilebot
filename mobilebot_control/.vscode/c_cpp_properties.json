@@ -1,0 +1,20 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/opt/ros/melodic/include/**",
+        "/home/dongthanh/ros/src/demo/include/**",
+        "/home/dongthanh/ros/src/mobilebot_bringup/include/**",
+        "/home/dongthanh/ros/src/mobilebot_control/include/**",
+        "/home/dongthanh/ros/src/mobilebot_navigation/include/**",
+        "/home/dongthanh/ros/src/mobilebot_slam/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS"
+    }
+  ]
+}

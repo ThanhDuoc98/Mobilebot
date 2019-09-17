@@ -1,0 +1,538 @@
+<?xml version="1.0" ?>
+
+<robot name="mobilebot" xmlns:xacro="https://www.ros.org/wiki/xacro" >  
+
+<!-- include xacro -->
+  <!-- include materials-->
+  <xacro:include filename="$(find mobilebot_description)/urdf/materials.xacro" />
+
+<!--   differential drive plugin  -->
+	<gazebo>
+		<plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
+			<updateRate>50000.0</updateRate>
+			<robotNamespace>/</robotNamespace>
+			<leftFrontJoint>p3at_front_left_wheel_joint</leftFrontJoint>
+			<rightFrontJoint>p3at_front_right_wheel_joint</rightFrontJoint>
+			<leftRearJoint>p3at_back_left_wheel_joint</leftRearJoint>
+			<rightRearJoint>p3at_back_right_wheel_joint</rightRearJoint>
+			<wheelSeparation>0.4</wheelSeparation>
+			<wheelDiameter>0.215</wheelDiameter>
+			<robotBaseFrame>base_link</robotBaseFrame>
+			<torque>200</torque>
+			<commandTopic>cmd_vel</commandTopic>
+			<odometryTopic>odom</odometryTopic>
+			<odometryFrame>odom</odometryFrame>
+			<broadcastTF>1</broadcastTF>
+		</plugin>
+	</gazebo>
+
+<!-- Chassis -->
+	<link name="base_link">
+		<!-- pose and inertial -->
+    	<!-- <pose>0 0 0.1 0 0 0</pose> -->
+		
+		<inertial>
+			<mass value="10.0"/>
+			<origin xyz="0 0 0.177"/>
+			<inertia ixx="0.3338" ixy="0.0" ixz="0.0"
+				 iyy="0.4783" iyz="0.0"
+				 izz="0.3338"/>
+		</inertial>
+		<visual>
+			<origin xyz="0 0 0.177" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/chassis.stl"/>
+			</geometry>
+			<material name="ChassisRed"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0.177" rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://mobilebot_description/meshes/p3at_meshes/chassis.stl"/>
+				</geometry>
+		</collision>
+	</link>
+	<gazebo reference="base_link">
+		<material>Gazebo/Red</material>
+	</gazebo>
+
+<!-- Top -->
+	<link name="top_plate">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="-0.025 0 -0.223"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0"
+ 				izz="1.0"/>
+		</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/top.stl"/>
+			</geometry>
+			<material name="TopBlack"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0 0 0"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="top_plate">
+		<material>Gazebo/Black</material>
+	</gazebo>
+	<joint name="base_top_joint" type="fixed">
+		<origin xyz="0.003 0 0.274" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="top_plate"/>
+	</joint>
+
+<!-- Front + Back Sonar -->
+	<link name="front_sonar">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+		</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/front_sonar.stl"/>
+			</geometry>
+			<material name="SonarYellow"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0 0 0"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="front_sonar">
+		<material>Gazebo/Yellow</material>
+	</gazebo>
+	<joint name="base_front_joint" type="fixed">
+		<origin xyz="0.193 0 0.25" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="front_sonar"/>
+	</joint>
+
+	<link name="back_sonar">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+		</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/back_sonar.stl"/>
+			</geometry>
+			<material name="SonarYellow"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0 0 0"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="back_sonar">
+		<material>Gazebo/Yellow</material>
+	</gazebo>
+	<joint name="base_back_joint" type="fixed">
+		<origin xyz="-0.187 0 0.247" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="back_sonar"/>
+	</joint>
+
+<!-- Front Axles + Wheels + Hubcaps -->
+	<!-- left -->
+	<link name="p3at_front_left_axle">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+  	 	</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/axle.stl"/>
+			</geometry>
+			<material name="AxleGrey"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0 0 0"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="p3at_front_left_axle">
+		<material>Gazebo/Grey</material>
+	</gazebo>
+	<joint name="base_front_left_axle_joint" type="fixed">
+		<origin xyz="0.135 0.156 0.111" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="p3at_front_left_axle"/>
+	</joint>
+
+	<link name="p3at_front_left_hub">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+  	 	</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry nttame="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/left_hubcap.stl"/>
+			</geometry>
+			<material name="HubcapYellow"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0 0 0"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="p3at_front_left_hub">
+		<material>Gazebo/Yellow</material>
+	</gazebo>
+	<joint name="base_front_left_hub_joint" type="fixed">
+		<origin xyz="0 0.041 0" rpy="0 0 0"/>
+		<parent link="p3at_front_left_axle"/>
+		<child link="p3at_front_left_hub"/>
+	</joint>
+
+	<link name="p3at_front_left_wheel">
+		<inertial>
+			<mass value="0.5"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="0.012411765597" ixy="0" ixz="0"
+         iyy="0.015218160428" iyz="0" izz="0.011763977943"/>
+      </inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/wheel.stl"/>
+			</geometry>
+			<material name="WheelBlack"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="${-3.1415927/2} 0 0"/>
+			<geometry>
+				<!-- <mesh filename="package://mobilebot_description/meshes/p3at_meshes/wheel.stl"/> -->
+				<cylinder radius="0.111" length="0.075"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="p3at_front_left_wheel">
+		<material>Gazebo/Black</material>
+	</gazebo>
+	<joint name="p3at_front_left_wheel_joint" type="continuous">
+		<axis xyz="0 1 0"/>
+					<anchor xyz="0 0 0"/>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<parent link="p3at_front_left_hub"/>
+		<child link="p3at_front_left_wheel"/>
+
+					<limit effort="100" velocity="100" />
+					<joint_properties damping="0.7"/>
+	</joint>
+	<!-- right -->
+	<link name="p3at_front_right_axle">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+  	 	</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/axle.stl"/>
+			</geometry>
+			<material name="AxleGrey"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0 0 0"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="p3at_front_right_axle">
+		<material value="Gazebo/Grey"/>
+	</gazebo>
+	<joint name="base_front_right_axle_joint" type="fixed">
+		<origin xyz="0.135 -0.156 0.111" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="p3at_front_right_axle"/>
+	</joint>
+
+	<link name="p3at_front_right_hub">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+  	 	</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/right_hubcap.stl"/>
+			</geometry>
+			<material name="HubcapYellow"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0 0 0"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="p3at_front_right_hub">
+		<material value="Gazebo/Yellow"/>
+	</gazebo>
+	<joint name="base_front_right_hub_joint" type="fixed">
+		<origin xyz="0 -0.041 0" rpy="0 0 0"/>
+		<parent link="p3at_front_right_axle"/>
+		<child link="p3at_front_right_hub"/>
+	</joint>
+
+	<link name="p3at_front_right_wheel">
+		<inertial>
+			<mass value="0.5"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="0.012411765597" ixy="0" ixz="0"
+         iyy="0.015218160428" iyz="0" izz="0.011763977943"/>
+      </inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/wheel.stl"/>
+			</geometry>
+			<material name="WheelBlack"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="${-3.1415927/2} 0 0"/>
+			<geometry>
+				<!--mesh filename="package://mobilebot_description/meshes/p3at_meshes/wheel.stl"/-->
+				<cylinder radius="0.111" length="0.075"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="p3at_front_right_wheel">
+		<material value="Gazebo/Black"/>
+	</gazebo>
+	<joint name="p3at_front_right_wheel_joint" type="continuous">
+		<axis xyz="0 1 0"/>
+					<anchor xyz="0 0 0"/>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<parent link="p3at_front_right_hub"/>
+		<child link="p3at_front_right_wheel"/>
+
+					<limit effort="100" velocity="100" />
+					<joint_properties damping="0.7"/>
+	</joint>
+
+<!-- Back Axles + Wheels + Hubcaps -->
+	<!-- left -->
+	<link name="p3at_back_left_axle">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+  	 	</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/axle.stl"/>
+			</geometry>
+			<material name="AxleGrey"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/axle.stl"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="p3at_back_left_axle">
+		<material>Gazebo/Grey</material>
+	</gazebo>
+	<joint name="p3at_back_left_axle_joint" type="fixed">
+		<origin xyz="-0.134 0.156 0.111" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="p3at_back_left_axle"/>
+	</joint>
+
+	<link name="p3at_back_left_hub">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+  	 	</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/left_hubcap.stl"/>
+			</geometry>
+			<material name="HubcapYellow"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/right_hubcap.stl"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="p3at_back_left_hub">
+		<material>Gazebo/Yellow</material>
+	</gazebo>
+	<joint name="p3at_back_left_hub_joint" type="fixed">
+		<origin xyz="-0 0.041 0" rpy="0 0 0"/>
+		<parent link="p3at_back_left_axle"/>
+		<child link="p3at_back_left_hub"/>
+	</joint>
+
+	<link name="p3at_back_left_wheel">
+		<inertial>
+			<mass value="0.5"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="0.012411765597" ixy="0" ixz="0"
+         iyy="0.015218160428" iyz="0" izz="0.011763977943"/>
+      </inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/wheel.stl"/>
+			</geometry>
+			<material name="WheelBlack"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="${-3.1415927/2} 0 0"/>
+			<geometry>
+				<!--mesh filename="package://mobilebot_description/meshes/p3at_meshes/wheel.stl"/-->
+				<cylinder radius="0.111" length="0.075"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="p3at_back_left_wheel">
+		<material>Gazebo/Black</material>
+	</gazebo>
+	<joint name="p3at_back_left_wheel_joint" type="continuous">
+	  <axis xyz="0 1 0"/>
+          <anchor xyz="0 0 0"/>
+          <limit effort="100" velocity="100" />
+          <joint_properties damping="0.7"/>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<parent link="p3at_back_left_hub"/>
+		<child link="p3at_back_left_wheel"/>
+	</joint>
+	<!-- right -->
+	<link name="p3at_back_right_axle">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+  	 	</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/axle.stl"/>
+			</geometry>
+			<material name="AxleGrey"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/axle.stl"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="p3at_back_right_axle">
+		<material>Gazebo/Grey</material>
+	</gazebo>
+	<joint name="p3at_back_right_axle_joint" type="fixed">
+		<origin xyz="-0.134 -0.156 0.111" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="p3at_back_right_axle"/>
+	</joint>
+
+	<link name="p3at_back_right_hub">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+  	 	</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/right_hubcap.stl"/>
+			</geometry>
+			<material name="HubcapYellow"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/right_hubcap.stl"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="p3at_back_right_hub">
+		<material>Gazebo/Yellow</material>
+	</gazebo>
+	<joint name="p3at_back_right_hub_joint" type="fixed">
+		<origin xyz="-0 -0.041 0" rpy="0 0 0"/>
+		<parent link="p3at_back_right_axle"/>
+		<child link="p3at_back_right_hub"/>
+	</joint>
+
+	<link name="p3at_back_right_wheel">
+		<inertial>
+			<mass value="0.5"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="0.012411765597" ixy="0" ixz="0"
+         iyy="0.015218160428" iyz="0" izz="0.011763977943"/>
+      </inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://mobilebot_description/meshes/p3at_meshes/wheel.stl"/>
+			</geometry>
+			<material name="WheelBlack"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="${-3.1415927/2} 0 0"/>
+			<geometry>
+				<!--mesh filename="package://mobilebot_description/meshes/p3at_meshes/wheel.stl"/-->
+				<cylinder radius="0.111" length="0.075"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="p3at_back_right_wheel">
+		<material>Gazebo/Black</material>
+	</gazebo>
+	<joint name="p3at_back_right_wheel_joint" type="continuous">
+	  <axis xyz="0 1 0"/>
+          <anchor xyz="0 0 0"/>
+          <limit effort="100" velocity="100" />
+          <joint_properties damping="0.7"/>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<parent link="p3at_back_right_hub"/>
+		<child link="p3at_back_right_wheel"/>
+	</joint>
+  
+</robot>
