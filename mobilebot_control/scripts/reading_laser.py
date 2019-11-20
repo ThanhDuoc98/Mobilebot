@@ -8,18 +8,23 @@ from sensor_msgs.msg import LaserScan
 # split the laser scan into five distinct readings
 def callback_laser(msg):
     # 640 / 5 = 128
+    msg_array = []
+    for i in range(640):
+        if math.isnan(msg.ranges[i]):
+            msg_array.append(5)
+        else:
+            msg_array.append(msg.ranges[i])
+
     regions = [
-        min(min(msg.ranges[0:127]), 5),
-        min(min(msg.ranges[128:255]), 5),
-        min(min(msg.ranges[256:383]), 5),
-        min(min(msg.ranges[384:511]), 5),
-        min(min(msg.ranges[512:639]), 5)
+        min(min(msg_array[0:127]), 5),
+        min(min(msg_array[128:255]), 5),
+        min(min(msg_array[256:383]), 5),
+        min(min(msg_array[384:511]), 5),
+        min(min(msg_array[512:639]), 5)
     ]
-    for i in range(5):
-        if math.isnan(regions[i]):
-            regions[i] = 5
+    rospy.loginfo(regions)
         
-    rospy.loginfo(msg) # stdout, alike print
+    #rospy.loginfo(msg) # stdout, alike print
 
 
 # reading laser

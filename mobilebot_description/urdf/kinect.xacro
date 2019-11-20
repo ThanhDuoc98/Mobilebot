@@ -13,14 +13,14 @@
     xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics"
     xmlns:xacro="https://www.ros.org/wiki/xacro">
     
-  <!-- math constants -->
+ <!-- math constants -->
   <xacro:property name="M_PI" value="3.1415926535897931" />
-  <xacro:macro name="kinect" params="xyz parent_frame" >
+  <xacro:macro name="kinect" params="xyz rpy parent_frame" >
   
   <joint name="base_camera_joint" type="fixed">
-    <axis xyz="0 1 0" />
-    <origin xyz="${xyz}" rpy="0.0 0.0 0.0" />
+    <origin xyz="${xyz}" rpy="${rpy}" />
     <parent link="${parent_frame}" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
     <child link="camera_link" />
   </joint>
 
@@ -34,7 +34,7 @@
     </inertial>
 
     <visual>
-      <origin xyz=" 0 0 0 " rpy="0 0 1.570796327" />
+      <origin xyz=" 0 0 0 " rpy="0 0 0" />
       <geometry>
         <mesh filename="package://mobilebot_description/meshes/kinect.dae"/>
       </geometry>
@@ -43,7 +43,7 @@
     <collision>
       <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
       <geometry>
-        <box size="0.0730 0.2760 0.0720"/>
+        <box size="0.0730 .2760 0.0720"/>
       </geometry>
     </collision>
 
@@ -66,7 +66,7 @@
   </link>
 
   <joint name="camera_depth_optical_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="0 0 0" />
+    <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
     <parent link="camera_depth_frame" />
     <child link="camera_depth_optical_frame" />
   </joint>
@@ -83,7 +83,7 @@
 
   <joint name="camera_rgb_joint" type="fixed">
     <origin xyz="0 -0.012 0" rpy="0 0 0" />
-    <parent link="camera_depth_frame" />
+    <parent link="camera_link" />
     <child link="camera_rgb_frame" />
   </joint>
 
@@ -98,7 +98,7 @@
   </link>
 
   <joint name="camera_rgb_optical_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="0 0 0" />
+    <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
     <parent link="camera_rgb_frame" />
     <child link="camera_rgb_optical_frame" />
   </joint>

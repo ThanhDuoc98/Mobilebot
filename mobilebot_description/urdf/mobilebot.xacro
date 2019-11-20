@@ -293,65 +293,7 @@
 
 
 <!-- kinect camera -->
-	<!-- <xacro:kinect xyz="0.150 0 0.037" parent_frame="top_plate" /> -->
-	<link name="camera_link">
-		<visual>
-			<origin xyz="0 0 0" rpy="0 0 1.570796"/>
-			<geometry>
-				<mesh filename="package://mobilebot_description/meshes/kinect.dae"/>
-			</geometry>
-		</visual>
-		<collision>
-			<origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
-			<geometry>
-				<box size="0.07271 0.27794 0.073"/>
-			</geometry>
-		</collision>
-		<inertial>
-			<mass value="0.564" />
-			<origin xyz="0 0 0" rpy="0 0 0"/>
-			<inertia ixx="0.003881243" ixy="0.0" ixz="0.0"
-								iyy="0.000498940" iyz="0.0"
-								izz="0.003879257" />
-		</inertial>
-  	</link>
-	<joint name="camera_joint" type="fixed">
-		<axis xyz="0 1 0" />
-		<origin xyz="0.150 0 0.037" rpy="0 0 0"/>
-		<parent link="top_plate"/>
-		<child link="camera_link"/>
-	</joint>
-
-	<joint name="camera_rgb_joint" type="fixed">
-		<!-- <origin xyz="-0.087 -0.0125 0.2870" rpy="0 0 0"/> -->
-		<origin xyz="-0.087 -0.0125 0.2870" rpy="0 0 0"/>
-		<parent link="camera_link"/>
-		<child link="camera_rgb_frame"/>
-	</joint>
-	<link name="camera_rgb_frame"/>
-
-	<joint name="camera_rgb_optical_joint" type="fixed">
-		<!-- <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" /> -->
-		<origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
-		<parent link="camera_rgb_frame" />
-		<child link="camera_rgb_optical_frame" />
-	</joint>
-	<link name="camera_rgb_optical_frame"/>
-
-	<joint name="camera_depth_joint" type="fixed">
-		<origin xyz="0 -0.0250 0" rpy="0 0 0" />
-		<parent link="camera_rgb_frame" />
-		<child link="camera_depth_frame" />
-	</joint>
-	<link name="camera_depth_frame"/>
-
-	<joint name="camera_depth_optical_joint" type="fixed">
-		<!-- <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" /> -->
-		<origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
-		<parent link="camera_depth_frame" />
-		<child link="camera_depth_optical_frame" />
-	</joint>
-	<link name="camera_depth_optical_frame" />
+	<xacro:kinect xyz="0.150 0 0.037" rpy="0 0 0" parent_frame="top_plate" />
 
 	<gazebo reference="camera_link">
 		<sensor type="depth" name="openni_camera">
