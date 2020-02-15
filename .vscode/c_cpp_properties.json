@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/opt/ros/melodic/include/**",
+                "/home/dongthanh/ros/src/demo/include/**",
+                "/home/dongthanh/ros/src/mobilebot_bringup/include/**",
+                "/home/dongthanh/ros/src/mobilebot_control/include/**",
+                "/home/dongthanh/ros/src/mobilebot_gazebo/include/**",
+                "/home/dongthanh/ros/src/mobilebot_navigation/include/**",
+                "/home/dongthanh/ros/src/mobilebot_slam/include/**",
+                "/usr/include/**"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

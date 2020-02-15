@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
 
-    <include file="$(find mobilebot_gazebo)/worlds/empty_world.launch">
-          <arg name="paused" value="false"/>
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+      <arg name="world_name" value="$(find mobilebot_gazebo)/worlds/stock.world"/>
+      <arg name="paused" value="false"/>
       <arg name="use_sim_time" value="true"/>
       <arg name="gui" value="true"/>
       <arg name="headless" value="false"/>
@@ -13,7 +14,7 @@
  
     <arg name="x" default="0"/>
     <arg name="y" default="0"/>
-    <arg name="z" default="0.5"/>
+    <arg name="z" default="0"/>
  
     <node name="spawn_mobilebot" pkg="gazebo_ros" type="spawn_model" output="screen"
           args="-urdf -param robot_description -model mobilebot -x $(arg x) -y $(arg y) -z $(arg z)" />
@@ -32,8 +33,8 @@
     <node pkg="nodelet" type="nodelet" name="laserscan_nodelet_manager" args="manager"/>
     <node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan" args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet laserscan_nodelet_manager">
         <param name="scan_height" value="10"/>
-        <param name="output_frame_id" value="/camera_depth_frame"/>
-        <param name="range_min" value="0.45"/>
+        <param name="output_frame_id" value="camera_depth_frame"/>
+        <param name="range_min" value="0.4"/>
         <remap from="image" to="/camera/depth/image_raw"/>
         <remap from="scan" to="/scan"/>
     </node>

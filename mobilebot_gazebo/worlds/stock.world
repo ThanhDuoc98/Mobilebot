@@ -33,7 +33,7 @@
 
     <!-- A mobilebot symbol -->
     <include>
-      <uri>model://mobilebot_house</uri>
+      <uri>model://mobilebot_stock</uri>
     </include>
 
     <scene>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
   <!-- Arguments -->
-  <arg name="map_file" default="$(find mobilebot_navigation)/maps/map.yaml"/>
+  <arg name="map_file" default="$(find mobilebot_navigation)/maps/map_stock_karto.yaml"/>
   <arg name="open_rviz" default="true"/>
   <arg name="move_forward_only" default="false"/>
 
-  <!-- Turtlebot3 -->
+  <!-- Mobilebot -->
   <include file="$(find mobilebot_bringup)/launch/mobilebot_remote.launch"/>
 
   <!-- Map server -->
